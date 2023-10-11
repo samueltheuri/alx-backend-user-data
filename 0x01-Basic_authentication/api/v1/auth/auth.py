@@ -1,40 +1,37 @@
-nage API authentication system
+#!/usr/bin/env python3
+"""Authentication module.
 """
 from flask import request
 from typing import List, TypeVar
+import fnmatch
 
 
-class Auth():
-    """
-    Manage API authentication methods
+class Auth:
+    """Authentication class.
     """
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
-        """ Return boolean """
-        if path is None or excluded_paths is None or not len(excluded_paths):
+        """ Method to check if auth is required.
+        """
+        if path is None:
             return True
 
-        if path[-1] != '/':
-            path += '/'
-        if excluded_paths[-1] != '/':
-            excluded_paths += '/'
+        if excluded_paths is None or not excluded_paths:
+            return True
 
-        astericks = [stars[:-1]
-                     for stars in excluded_paths if stars[-1] == '*']
-
-        for stars in astericks:
-            if path.startswith(stars):
+        for excluded_path in excluded_paths:
+            if fnmatch.fnmatch(path, excluded_path):
                 return False
 
-        if path in excluded_paths:
-            return False
         return True
 
     def authorization_header(self, request=None) -> str:
-        """ Request Flask object """
-        if request is None or 'Authorization' not in request.headers:
-            return None
-        return request.headers.get('Authorization')
+        """ Method to get authorization header.
+        """
+        if request is not None:
+            return request.headers.get('Authorization', None)
+        return None
 
     def current_user(self, request=None) -> TypeVar('User'):
-        """ Flask request object """
+        """ Method to get user from request.
+        """
         return None
